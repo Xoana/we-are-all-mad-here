@@ -1,1 +1,3 @@
 # we-are-all-mad-here
+
+This repository contains random stuff...
