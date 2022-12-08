@@ -24,7 +24,6 @@ def main(target_folder,target_date,skip_delete):
         
         python delete_files.py --target_date 2022-11-01 --target_folder ./path_to_folder/ --skip_delete &> output.log
     '''
-
     target_date_str = target_date.strftime("%Y-%m-%d")
     logging.info('>>>>> Deleting files with modified date on or before %s. <<<<<', target_date_str)
     target_date_epoch = datetime.strptime(target_date_str, "%Y-%m-%d").timestamp()
