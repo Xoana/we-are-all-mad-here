@@ -8,7 +8,8 @@
 1. ```$ python -m pip install --upgrade pip```
 1. Install dependencies for nodeenv: https://pypi.org/project/nodeenv/#local-installation
 1. ```$ pip install nodeenv```
-1. ```$ nodeenv -p```
+1. ```$ nodeenv -p``` 
+    **Note**: To install a specific version: ```nodeenv -p --node=16.13.2```
     **Note**: Might receive error; see [Error: Failed to create nodejs.exe link](#error-failed-to-create-nodejsexe-link).
 1. ```$ node -v```
 1. ```$ npm i @angular/core```
@@ -24,3 +25,5 @@
 ### Error: Failed to create nodejs.exe link
 
 Seems to work anyway...
+
+https://issueantenna.com/repo/ekalinin/nodeenv/issues
