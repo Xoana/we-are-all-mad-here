@@ -1,3 +1,5 @@
 # we-are-all-mad-here
 
-This repository contains random stuff...
+> “Oh, you can’t help that,” said the Cat: “we’re all mad here. I’m mad. You’re mad.” “How do you know I’m mad?” said Alice. “You must be,” said the Cat, or you wouldn’t have come here.”
+
+~ _Alice in Wonderland_ by Lewis Carroll
