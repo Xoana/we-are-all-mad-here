@@ -4,7 +4,7 @@ Requires yaml (or json) file in the following format:
 tableau:
   token_name: <token_name>
   token_secret: <token_secret>
-  auth_url: <url_for_authentication>
+  base_url: <base_api_url>
 '''
 import json
 import click
@@ -12,13 +12,24 @@ import requests
 from general_utils import get_config
 
 
-def get_bearer_token(credentials):
+
+def query_sites(tableau_base_url, bearer_token):
+    ''' Query Tableau sites. '''
+    sites_url = f'{tableau_base_url}/sites'
+
+    payload={}
+    headers = {
+    'Authorization': f'Bearer {bearer_token}'
+    }
+
+    response = requests.request("GET", sites_url, headers=headers, data=payload)
+
+    print(response.text)
+
+def get_bearer_token(tableau_token,tableau_secret,tableau_base_url):
     ''' Get bearer token from Tableau API. '''
-    tableau_token=credentials['tableau']['token_name']
-    tableau_secret=credentials['tableau']['token_secret']
-    tableau_auth_url = credentials['tableau']['auth_url']
     
-    auth_url = tableau_auth_url
+    auth_url = f'{tableau_base_url}/auth/signin'
 
     auth_payload = {
         'credentials': {
@@ -49,9 +60,13 @@ def get_bearer_token(credentials):
               help='Path to the file in which credentials are stored.')
 def main(credentials_file):
     credentials = get_config(credentials_file)
+    tableau_token=credentials['tableau']['token_name']
+    tableau_secret=credentials['tableau']['token_secret']
+    tableau_base_url = credentials['tableau']['base_url']
 
-    bearer_token, site_id = get_bearer_token(credentials)    
+    bearer_token, site_id = get_bearer_token(tableau_token,tableau_secret,tableau_base_url)    
     print(bearer_token, site_id)
+    query_sites(tableau_base_url, bearer_token)
 
 
 if __name__ == '__main__':

@@ -5,7 +5,7 @@
 
 1. Create and activate python venv.
 
-1. pip install dependencies for nodeenv; see [Local Installation](https://pypi.org/project/nodeenv/#local-installation).
+1. pip install dependencies for nodeenv (make & tail); see [Local Installation](https://pypi.org/project/nodeenv/#local-installation).
 
     **Note**: To install libssl-dev, ```pip install cryptography``` and ```pip install paramiko```.
 
@@ -26,7 +26,6 @@
 
 1. Install Angular Core and CLI:
     ```$ npm i @angular/cli```
-    ```$ npm i @angular/core```
 
 ## Create an Angular Application
 
@@ -34,4 +33,9 @@
     ```ng new hello-world```
 1. Build application:
     ```ng serve```
+    **Note**: 
+
+npm cache clean --force    
 1. Confirm that it works by accessing localhost:4200.
+
+
