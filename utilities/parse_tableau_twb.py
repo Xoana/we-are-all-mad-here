@@ -1,184 +1,252 @@
-import sys
-import glob
+'''
+This script is used to parse a Tableau .twb file, extract various elements 
+(worksheets, data sources, dashboards, filters, and calculations), and write
+the data to an Excel spreadsheet.
+'''
 import logging
 import pandas as pd
 import xml.etree.ElementTree as ET
-import numpy as np
 import click
-
 logging.basicConfig(level=logging.INFO, format='%(message)s')
 
-LIST_TWB_ELEMENTS = ['worksheet', 'dashboard']
+def get_list_of_elements(datasources,columns_by_worksheet,worksheets_by_dashboard):
+    ''' Returns a list of data sources, dashboards, and worksheets. '''
+    element_data = []
+    element_data = build_element_data(element_data,datasources.datasource_caption.dropna().unique(),'datasource')
+    element_data = build_element_data(element_data,columns_by_worksheet.worksheet_name.unique(),'worksheet')
+    element_data = build_element_data(element_data,worksheets_by_dashboard.dashboard_name.unique(),'dashboard')
 
-LIST_OUTPUT_FILES = ['combined_fields_by_data_source.csv',
-                   'combined_sources_by_dashboard.csv',
-                   'combined_sources_by_worksheet.csv']
+    element_df = pd.DataFrame.from_records(element_data)   
 
+    return element_df
 
-def get_datasources(twb_element, template_file, template_name):
-    ''' Returns csv file of data sources used for each worksheet. '''
-    column_headers = [twb_element, 'data_source', 'dependency']
-    root = ET.parse(template_file).getroot()
-    list_elements = []
-    for root_element in root.iter():
-        if root_element.tag == twb_element:
-            # Name based on twb_element (worksheet or dashboard)
-            element_name = root_element.attrib['name']
+def build_element_data(element_data,unique_list,type):
+    ''' Builds a list of dictionaries for writing Summary to Excel. '''
+    for item in unique_list:
+        summary_dict = {}
+        summary_dict['element_name'] = item
+        summary_dict['element_type'] = type
+        element_data.append(summary_dict)
+    return(element_data)
 
-            datasource = root_element.iter(tag='datasource')
+def get_datasources(input_file):
+    ''' Returns distinct data source name and caption. '''
+    root = ET.parse(input_file).getroot()
+    dashboard_data = []
 
-            for data in datasource:
+    for element in root:
+        if element.tag == 'datasources':
+            for child in element:
+                datasource_caption = child.attrib.get('caption')
+                datasource_name = child.attrib.get('name')
+                for child2 in child:
+                    if 'connection' in child2.tag:
+                        for connection_element in child2:
+                            if '_.fcp.ObjectModelEncapsulateLegacy.true...relation' in connection_element.tag:
+                                datasource_query = connection_element.text
 
-                element_details_lst = []
-                element_details_lst.append(element_name)
+                                element_dict = {}
+                                element_dict['datasource_caption'] = datasource_caption
+                                element_dict['datasource_name'] = datasource_name
+                                element_dict['datasource_query'] = datasource_query
+                                dashboard_data.append(element_dict)
+                   
+    datasources = pd.DataFrame.from_records(dashboard_data)   
 
-                if 'caption' in data.attrib:
-                    data_source = data.attrib['caption']
-                    element_details_lst.append(data_source)
+    return datasources   
 
-                if 'name' in data.attrib:
-                    dependency_name = data.attrib['name']
-                    element_details_lst.append(dependency_name)
-                list_elements.append(element_details_lst)
+def get_columns_by_datasource(input_file):
+    ''' Returns columns and calculations by data source. '''
+    root = ET.parse(input_file).getroot()
+    datasources_data = []
 
-    datasource_df = pd.DataFrame(list_elements)
+    for element in root:
+        if element.tag == 'datasources':
+            for child in element:
+                datasource_name = child.attrib.get('caption')
+                for child_element in child:
+                    if child_element.tag == 'column':
+                        column_caption = child_element.attrib.get('caption') if 'caption' in child_element.attrib else 'none'
+                        column_name = child_element.attrib.get('name')
+                        column_datatype = child_element.attrib.get('datatype')
+                        column_hidden = child_element.attrib.get('hidden')
+                        if len(list(child_element)) > 0:
+                            for calculation in child_element:
+                                column_calc = calculation.attrib.get('formula') if 'formula' in calculation.attrib else 'none'
+                        else:
+                            column_calc = 'none'
 
-    datasource_df.to_csv(f'datasource_by_{twb_element}_{template_name}.csv', sep=',', index=False, header=column_headers)
+                        element_dict = {}
 
+                        element_dict['datasource_name'] = datasource_name
+                        element_dict['column_caption'] = column_caption
+                        element_dict['column_name'] = column_name
+                        element_dict['column_datatype'] = column_datatype
+                        element_dict['column_hidden'] = column_hidden
+                        element_dict['column_calc'] = column_calc
+                        datasources_data.append(element_dict)
+    datasources_df = pd.DataFrame.from_records(datasources_data)   
 
-def get_fields(twb_element, template_file, template_name):
-    ''' Returns csv file of data sources used for each worksheet. '''
-    column_headers = [twb_element, 'remote_field_name',
-                      'tableau_field_name',
-                      'datatype', 'data_source',
-                      'dependency']
+    return datasources_df
 
-    root = ET.parse(template_file).getroot()
+def get_datasources_by_worksheet(input_file): 
+    ''' Returns data sources by worksheet. '''
+    root = ET.parse(input_file).getroot()
 
-    list_elements = []
+    worksheet_data = []
 
-    for element in root.iter():
-        if element.tag == twb_element:
-            worksheet_name = element.attrib['name']
+    for element in root:
+        if element.tag == 'worksheets':
+            for child in element:
+                worksheet_name = child.attrib.get('name')
+                for child_element in child:
+                    if child_element.tag == 'table':
+                        for table_element in child_element:
+                            if table_element.tag == 'view':
+                                for view_element in table_element:
+                                    if view_element.tag == 'datasources':
+                                        for datasource_element in view_element:
+                                            datasource_caption = datasource_element.attrib.get('caption')
+                                            datasource_name = datasource_element.attrib.get('name')
+                                            element_dict = {}
+                                            element_dict['worksheet_name'] = worksheet_name
+                                            element_dict['datasource_caption'] = datasource_caption
+                                            element_dict['datasource_name'] = datasource_name
+                                            worksheet_data.append(element_dict)
+    columns_by_worksheet = pd.DataFrame.from_records(worksheet_data)   
 
-            for root_element in element.iter():
-
-                if root_element.tag == 'datasource-dependencies':
-
-                    dependency = root_element.attrib['datasource']
-
-                    columns = element.iter(tag='column')
-
-                    for data in columns:
-                        element_details_lst = []
-                        element_details_lst.append(worksheet_name)
-
-                        if 'name' in data.attrib:
-                            remote_field_name = data.attrib['name'].strip('[]')
-
-                            if 'Parameter' in remote_field_name or 'Calculation_' in remote_field_name:
-                                remote_field_name = f'Tableau ({remote_field_name})'
-                            element_details_lst.append(remote_field_name)
-
-                        if 'caption' in data.attrib:
-                            tableau_field_name = data.attrib['caption']
-                            element_details_lst.append(tableau_field_name)
-                        if 'caption' not in data.attrib:
-                            tableau_field_name = 'Remote field used in Tableau calculation.'
-                            element_details_lst.append(tableau_field_name)
-
-                        if 'datatype' in data.attrib:
-                            xml_datatype = data.attrib['datatype']
-                            element_details_lst.append(xml_datatype)
-
-                        datasource_df = pd.read_csv(f'datasource_by_{twb_element}_{template_name}.csv')
-                        datasource_dependency = datasource_df[datasource_df['dependency'] == dependency]
-                        try:
-                            datasource_name = datasource_dependency.iloc[0]['data_source']
-                        except Exception:
-                            datasource_name = 'Parameters'
-
-                        if len(element_details_lst) > 3:
-                            element_details_lst.append(datasource_name)
-                            element_details_lst.append(dependency)
-                            list_elements.append(element_details_lst)
-
-    field_df = pd.DataFrame(list_elements)
-    field_df.to_csv(f'fields_by_{twb_element}_{template_name}.csv', sep=',', index=False, header=column_headers)
-
-
-def create_fields_by_data_source_csv():
-    ''' Reads output files from previous functions to consolidate and deduplicate information regarding fields used from each data source. '''
-    all_filenames = [i for i in glob.glob('fields_by_worksheet_*.csv')]
-    combined_df = pd.concat([pd.read_csv(file_name) for file_name in all_filenames])
-    combined_df = combined_df[['remote_field_name', 'tableau_field_name',
-                               'datatype', 'data_source']]
-    combined_df = combined_df.dropna()
-
-    combined_df = combined_df[~combined_df['remote_field_name'].str.contains('Calculation')]
-    combined_df = combined_df[~combined_df['data_source'].str.contains('Parameters')]
-    # combined_df = combined_df[~combined_df['remote_field_name'].str.contains('Parameter')]
-    # combined_df = combined_df[~combined_df['tableau_field_name'].str.contains('Calculation')]
-    # combined_df = combined_df[~combined_df['data_source'].str.contains('Parameters')]
-
-    # combined_df['remote_field_name'] = combined_df.loc[combined_df['remote_field_name'].str.contains('Calculation_')] = f'Tableau {combined_df['remote_field_name']}'
-    # combined_df['source_location'] = np.where(combined_df['data_source'].str.contains('Parameters') | combined_df['remote_field_name'].str.contains('Calculation_'), 'tableau', 'external')
-    # combined_df['location'] = np.where(combined_df['remote_field_name'].str.contains('Calculation_'), 'tableau', 'hadoop')
-
-    combined_df = combined_df.drop_duplicates()
-    combined_df.to_csv(LIST_OUTPUT_FILES[0], sep=',', index=False)
+    return columns_by_worksheet
 
 
-def create_data_sources_by_dashboard_csv():
-    all_filenames = [i for i in glob.glob('datasource_by_dashboard_*.csv')]
-    combined_df = pd.concat([pd.read_csv(file_name) for file_name in all_filenames])
-    combined_df = combined_df[['dashboard', 'data_source']]
-    combined_df = combined_df[~combined_df['dashboard'].str.contains('pptx_')]
-    combined_df.to_csv(LIST_OUTPUT_FILES[1], sep=',', index=False)
+def get_columns_by_worksheet(input_file):
+    ''' Returns columns and calculations by worksheet. '''
+    root = ET.parse(input_file).getroot()
+
+    worksheet_data = []
+
+    for element in root:
+        if element.tag == 'worksheets':
+            for child in element:
+                worksheet_name = child.attrib.get('name')
+                for child_element in child:
+                    if child_element.tag == 'table':
+                        for table_element in child_element:
+                            if table_element.tag == 'view':
+                                for view_element in table_element:
+                                    if view_element.tag == 'datasource-dependencies':
+                                        for column_element in view_element:
+                                            if column_element.tag == 'column':
+                                                column_caption = column_element.attrib.get('caption') if 'caption' in column_element.attrib else 'none'
+                                                column_name = column_element.attrib.get('name')
+                                                column_datatype = column_element.attrib.get('datatype')
+                                                if len(list(column_element)) > 0:
+                                                    for calculation in column_element:
+                                                        if 'formula' in calculation.attrib:
+                                                            column_calc = calculation.attrib.get('formula')
+                                                else:
+                                                    column_calc = 'none'
+
+                                                element_dict = {}
+                                                element_dict['worksheet_name'] = worksheet_name
+                                                element_dict['column_caption'] = column_caption
+                                                element_dict['column_name'] = column_name
+                                                element_dict['column_datatype'] = column_datatype
+                                                element_dict['column_calc'] = column_calc
+                                                worksheet_data.append(element_dict)
+
+    columns_by_worksheet = pd.DataFrame.from_records(worksheet_data)   
+
+    return columns_by_worksheet
+
+def get_filters_by_worksheet(input_file): 
+    ''' Returns data sources by worksheet. '''
+    root = ET.parse(input_file).getroot()
+
+    sar_values = ['[',']','none:','rank:',':nk',':ok',':qk','usr:',':tqr',':']
+    element_data = []
+
+    for element in root:
+        if element.tag == 'worksheets':
+            for child in element:
+                worksheet_name = child.attrib.get('name')
+                for child_element in child:
+                    if child_element.tag == 'table':
+                        for table_element in child_element:
+                            if table_element.tag == 'view':
+                                for view_element in table_element:
+                                    if view_element.tag == 'filter':
+                                        filter_datasource = view_element.attrib.get('column').split('].[')[0]
+                                        filter_name = view_element.attrib.get('column').split('].[')[1]
+                                        for value in sar_values:
+                                            filter_datasource = filter_datasource.replace(value,'')
+                                            filter_name = filter_name.replace(value,'')
+                                        filter_notes = '' if filter_name != 'Measure Names' else 'This filter is used to display specific values and will show as a column on the worksheet; see Columns by Worksheet.'
+
+                                        element_dict = {}
+                                        element_dict['worksheet_name'] = worksheet_name
+                                        element_dict['filter_datasource'] = filter_datasource
+                                        element_dict['filter_name'] = filter_name
+                                        element_dict['filter_notes'] = filter_notes
+                                        element_data.append(element_dict)
+
+    filters_by_worksheet = pd.DataFrame.from_records(element_data)   
+
+    return filters_by_worksheet
+
+def get_worksheets_by_dashboard(input_file):
+    ''' Get worksheets by dashboard. '''
+    root = ET.parse(input_file).getroot()
+    element_data = []
+    
+    for element in root:
+        if element.tag == 'windows':
+            for child in element:
+                if child.tag == 'window':
+                    dashboard_name = child.attrib.get('name')
+                for child_element in child:
+                    if child_element.tag == 'viewpoints':
+                        for viewpoint_element in child_element:
+                            worksheet_name = viewpoint_element.attrib.get('name')
+
+                            element_dict = {}
+                            element_dict['dashboard_name'] = dashboard_name
+                            element_dict['worksheet_name'] = worksheet_name
+                            element_data.append(element_dict)
+
+    dashboard_ws_df = pd.DataFrame.from_records(element_data)   
+
+    return dashboard_ws_df    
 
 
-def create_data_sources_by_worksheet_csv():
-    all_filenames = [i for i in glob.glob('datasource_by_worksheet_*.csv')]
-    combined_df = pd.concat([pd.read_csv(file_name) for file_name in all_filenames])
+def write_excel(output_file,element_df,datasources,columns_by_datasource,datasources_by_worksheet,columns_by_worksheet,worksheets_by_dashboard,filters_by_worksheet):
+    ''' Write dataframes to Excel. '''
+    with pd.ExcelWriter(output_file) as writer:
+        element_df.to_excel(writer, sheet_name='Workbook Elements', index=False)
+        datasources.to_excel(writer, sheet_name='Datasources & Tableau Queries', index=False)
+        datasources_by_worksheet.to_excel(writer, sheet_name='Datasources by Worksheet', index=False)
+        worksheets_by_dashboard.to_excel(writer, sheet_name='Worksheets by Dashboard', index=False)
+        columns_by_datasource.to_excel(writer, sheet_name='Columns by Datasource', index=False)
+        columns_by_worksheet.to_excel(writer, sheet_name='Columns by Worksheet', index=False)
+        filters_by_worksheet.to_excel(writer, sheet_name='Filters by Worksheet', index=False)
 
-    combined_df = combined_df[['worksheet', 'data_source']]
-    combined_df = combined_df[~combined_df['data_source'].str.contains('Parameters')]
 
-    combined_df.to_csv(LIST_OUTPUT_FILES[2], sep=',', index=False)
-
-
-def combine_csv_files(output_filename):
-    ''' Combine csv files into one Excel sheet with separate tabs. '''
-
-    with pd.ExcelWriter(output_filename) as writer:  
-
-        for csv_file in LIST_OUTPUT_FILES:
-            csv_df = pd.read_csv(csv_file)
-            sheet_name = csv_file.strip('combined_').replace('.csv', '')
-            print(sheet_name)
-
-            csv_df.to_excel(writer, sheet_name=sheet_name, index=False)
-            
 @click.command()
-@click.option('--template_file', default='input_file.twb', show_default=True,
+@click.option('--input_file', default='input_file.twb', show_default=True,
               help='Name of the file to parse.')
-@click.option('--output_filename', default='final_data_sources_and_fields.xlsx', show_default=True,
-              help='Name of the file to parse.')              
-def main(template_file, output_filename):
+@click.option('--output_file', default='output_file.xlsx', show_default=True,
+              help='Name of the file to parse.')
+def main(input_file,output_file):
     ''' Parses a Tableau twb file and extracts the fields and data sources used on each worksheet and data source. '''
-    logging.info('Processing %s...',template_file)
-    template_name = template_file.strip('.twb')
+    logging.info('>>>> Processing %s...',input_file)
 
-    for twb_element in LIST_TWB_ELEMENTS:
-
-        get_datasources(twb_element, template_file, template_name)
-        if twb_element == 'worksheet':
-            get_fields(twb_element, template_file, template_name)
-
-    create_fields_by_data_source_csv()
-    create_data_sources_by_dashboard_csv()
-    create_data_sources_by_worksheet_csv()
-    combine_csv_files(output_filename)
+    datasources = get_datasources(input_file)
+    columns_by_datasource = get_columns_by_datasource(input_file)
+    datasources_by_worksheet = get_datasources_by_worksheet(input_file)
+    columns_by_worksheet = get_columns_by_worksheet(input_file)
+    worksheets_by_dashboard = get_worksheets_by_dashboard(input_file)
+    element_df = get_list_of_elements(datasources,columns_by_worksheet,worksheets_by_dashboard)
+    filters_by_worksheet = get_filters_by_worksheet(input_file)
+    write_excel(output_file,element_df,datasources,columns_by_datasource,datasources_by_worksheet,columns_by_worksheet,worksheets_by_dashboard,filters_by_worksheet)
 
 
 if __name__ == '__main__':
