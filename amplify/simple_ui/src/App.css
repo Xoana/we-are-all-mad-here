@@ -1,10 +1,10 @@
 @import '@aws-amplify/ui-react/styles.css';
 
 /* coolors: https://coolors.co/ */
-/* --platinum: #eaeaeaff;
---byzantium: #893168ff; 893168;
---violet-jtc: #4a1942ff;
---dark-purple: #2e1c2bff;
+/* --platinum: #eaeaea;
+--byzantium: #893168; 
+--violet-jtc: #4a1942;
+--dark-purple: #2e1c2b;
 --black: #050404ff; */
 
 .body-container {
@@ -22,7 +22,7 @@
 .footer-container {
   margin: 0;
   padding: 10px;
-  background-color: #2e1c2bff;
+  background-color: #2E1C2B;
   text-align: right;
   position:fixed;
   left: 0;
@@ -53,7 +53,7 @@ button.signout {
   background-color: #4A1942;
   border: 1px solid;
   border-radius: 5px;
-  color: #eaeaeaff
+  color: #EAEAEA;
 }
 
 /* TABS */
@@ -61,13 +61,16 @@ button.amplify-tabs-item {
   color: #9C9990;
   font-weight: normal;
 }
+button.amplify-tabs-item:hover {
+  color: #893168;
+  font-weight: normal;
+}
 button.amplify-tabs-item[data-state=active] {
-  color: #2e1c2bff;
-  border-color: #2e1c2bff;
+  color: #2E1C2B;
+  border-color: #2E1C2B;
   font-weight: 600;
 }
 
 button.amplify-button--primary {
-  background-color: #2e1c2bff;
-
+  background-color: #2E1C2B;
 }
