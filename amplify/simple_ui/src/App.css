@@ -1,0 +1,11 @@
+.footer {
+  background-color: #0c7c95;
+  color: #fff;
+  height: 50px;
+  align-content: center;
+}
+ul.navbar > li {
+  float: right;
+  width: 100px;
+  text-decoration: none;
+}
