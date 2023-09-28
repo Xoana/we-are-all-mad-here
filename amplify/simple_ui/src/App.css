@@ -1,18 +1,33 @@
 @import '@aws-amplify/ui-react/styles.css';
 
+/* coolors: https://coolors.co/ */
+/* --platinum: #eaeaeaff;
+--byzantium: #893168ff; 893168;
+--violet-jtc: #4a1942ff;
+--dark-purple: #2e1c2bff;
+--black: #050404ff; */
+
 .body-container {
-  margin: 50px;
+  margin: 100px 50px 25px 50px;
 }
 .header-container {
   margin: 0;
   padding: 10px;
-  background-color: #bab9ff;
+  background-color: #EAEAEA;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
 }
 .footer-container {
   margin: 0;
   padding: 10px;
-  background-color: #bab9ff;
+  background-color: #2e1c2bff;
   text-align: right;
+  position:fixed;
+  left: 0;
+  bottom: 0;
+  width: 100%;
 }
 ul.navbar > li {
   float: right;
@@ -22,17 +37,37 @@ ul.navbar > li {
 .legal {
   font-size: smaller;
   display: inline-block;
-  
+  color: #9C9990
 }
 h1.amplify-heading--1 {
   margin-bottom: 20px;
+  color: #4A1942;
+}
+div.amplify-alert {
+  margin: 5px;
 }
 button.signout {
   margin: 10px;
   padding: 5px 10px 8px 10px;
   font-weight:600;
-  background-color: #7e7dc9;
+  background-color: #4A1942;
   border: 1px solid;
   border-radius: 5px;
-  color: #fff
+  color: #eaeaeaff
+}
+
+/* TABS */
+button.amplify-tabs-item {
+  color: #9C9990;
+  font-weight: normal;
+}
+button.amplify-tabs-item[data-state=active] {
+  color: #2e1c2bff;
+  border-color: #2e1c2bff;
+  font-weight: 600;
+}
+
+button.amplify-button--primary {
+  background-color: #2e1c2bff;
+
 }
