@@ -1,9 +1,11 @@
 import './App.css';
+import * as React from 'react';
+// import '@aws-amplify/ui-react/styles.css';
 import { Amplify } from 'aws-amplify';
-import { Footer } from './components/Footer';
 import { Authenticator } from '@aws-amplify/ui-react';
-import '@aws-amplify/ui-react/styles.css';
-
+import { Header } from './components/Header';
+import { Home } from './components/Home'
+import { Footer } from './components/Footer';
 import awsExports from './aws-exports';
 Amplify.configure(awsExports);
 
@@ -12,8 +14,9 @@ export default function App() {
     <Authenticator>
       {({ signOut, user }) => (
         <main>
-          <h1>Hello {user.username}</h1>
-          <button onClick={signOut}>Sign out</button>
+          <Header />
+          <Home />
+          <button class='signout' onClick={signOut}>Sign out</button>
           <Footer />
         </main>
       )}

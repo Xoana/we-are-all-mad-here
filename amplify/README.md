@@ -19,13 +19,14 @@
 
     **Note**: *aws-exports.js* contains config details, which should match the user pool on AWS Cognito Management Console.
 
-1. Run app and create a new user in log in box. 
+1. Run app (`npm run start`) and create a new user in log in box. 
 
     **Note** User will be added to AWS Cognito Management Console. If user is created in AWS Management Console, ensure forced password reset is used.
 
 ## Hosting
 
-
+1. In the AWS Amplify Management Console, click your application, and then click the **Hosting environments** tab.
+1. Click your preferred hosting environment, and follow the prompts to connect.
 
 ## AWS CLI - Additional Commands
 

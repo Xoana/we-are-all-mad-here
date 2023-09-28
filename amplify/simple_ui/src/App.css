@@ -1,11 +1,38 @@
-.footer {
-  background-color: #0c7c95;
-  color: #fff;
-  height: 50px;
-  align-content: center;
+@import '@aws-amplify/ui-react/styles.css';
+
+.body-container {
+  margin: 50px;
+}
+.header-container {
+  margin: 0;
+  padding: 10px;
+  background-color: #bab9ff;
+}
+.footer-container {
+  margin: 0;
+  padding: 10px;
+  background-color: #bab9ff;
+  text-align: right;
 }
 ul.navbar > li {
   float: right;
   width: 100px;
   text-decoration: none;
+}
+.legal {
+  font-size: smaller;
+  display: inline-block;
+  
+}
+h1.amplify-heading--1 {
+  margin-bottom: 20px;
+}
+button.signout {
+  margin: 10px;
+  padding: 5px 10px 8px 10px;
+  font-weight:600;
+  background-color: #7e7dc9;
+  border: 1px solid;
+  border-radius: 5px;
+  color: #fff
 }
