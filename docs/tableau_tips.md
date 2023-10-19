@@ -1,0 +1,2 @@
+Hiding drill down:
+https://www.thedataschool.co.uk/tristan-kelly/hiding-or-removing-tableaus-drill-down-action/#:~:text=For%20Geographical%20Dimensions%2C%20Remove%20the%20Hierarchy&text=To%20remove%20this%20option%20from,no%20longer%20be%20drilled%20down

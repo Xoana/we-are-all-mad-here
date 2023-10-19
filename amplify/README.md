@@ -5,7 +5,7 @@
 1. Create venv; see [Run an Angular Application in nodeenv](../docs/run_angular_in_nodeenv.md) in this repo.
 1. Install Node.js.
 1. Install and configure Amplify CLI globally; refer to  [Installation](https://docs.amplify.aws/cli/start/install/).
-1. Create React app: `npx create-react-app simple_ui`
+1. Create React app: `npx create-react-app react-app-test`
 1. Initialize amplify: `amplify init`
 1. Install `ui-react`: `npm install aws-amplify @aws-amplify/ui-react`
 1. Add the following to your index.js file:

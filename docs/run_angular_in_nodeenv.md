@@ -7,10 +7,13 @@
 1. ```$ source ./Scripts/activate```
 1. ```$ python -m pip install --upgrade pip```
 1. Install dependencies for nodeenv: https://pypi.org/project/nodeenv/#local-installation
+make and tail
 1. ```$ pip install nodeenv```
 1. ```$ nodeenv -p``` 
-    **Note**: To install a specific version: ```nodeenv -p --node=16.13.2```
-    **Note**: Might receive error; see [Error: Failed to create nodejs.exe link](#error-failed-to-create-nodejsexe-link).
+    **Notes**:
+    * To install a specific version: ```nodeenv -p --node=16.13.2```
+    * If `nodeenv -p` returns error stating there is no venv, rerun the `source` command.
+    * See [Error: Failed to create nodejs.exe link](#error-failed-to-create-nodejsexe-link).
 1. ```$ node -v```
 1. ```$ npm i @angular/core```
 1. ```$ ng version```
@@ -27,3 +30,8 @@
 Seems to work anyway...
 
 https://issueantenna.com/repo/ekalinin/nodeenv/issues
+
+
+
+Nelson
+
