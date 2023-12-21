@@ -4,7 +4,7 @@
 
 1. Delete *node_modules* folder.
 1. Delete *package-lock.json*.
-1. Run ```npm install –force```.
+1. Run ```npm install --force```.
 
 ## Update Angular Version
 
@@ -13,12 +13,31 @@
 
     ```$ ng update @angular/cli@<version> @angular/core@<version>```
 
-    Where *<version>* is the target Angular version; for example, 
+    Where `<version>` is the Angular version; for example:
+
     ```$ ng update @angular/cli@12 @angular/core@12```
 
-    **Note**: You must upgrade one version at a time.
+    **Note**: You must upgrade one version at a time. Refer to the [Angular Upgrade Guide](https://update.angular.io/) for details on how to upgrade to each version.
+
+## Discover Vulnerabilities & Locate Package Dependencies
+
+To discover vulnerabilities within your project, run this command:
+
+`$ npm audit`
+    
+**Note**: To save the output to a file, add `> filename.txt`; for example, `npm audit > audit_results.txt`.
+
+To list dependencies for a specific package, run this command:
+
+`npm ls <package_name> dependencies`
+
+**Note**: You can also search the *package.json* files within the *node_modules* folder for specific package names using this command:
+
+`find ./node_modules -name package.json | xargs grep <package_name>`
 
 ## Create a Mock API
+
+Source: [Fake Your Angular Backend Until You Make It](https://blog.angulartraining.com/fake-your-angular-backend-until-you-make-it-8d145f713e14)
 
 1. ```npm install json-server```
 1. Create an ```api``` folder under ```src```; i.e., ```src/api```
@@ -53,6 +72,9 @@
     ```
     npm run api
     ```
+
+1. Access the API at `http://localhost:3000/api/periodicElements` to confirm the service is running.
+
 1. Add ```HttpClientModule``` to ```app.module.ts```.
     ```
     import { BrowserModule } from '@angular/platform-browser';
@@ -73,7 +95,3 @@
     })
     export class AppModule {}
     ```    
-
-References:
-* [Fake Your Angular Backend Until You Make It](https://blog.angulartraining.com/fake-your-angular-backend-until-you-make-it-8d145f713e14)
-

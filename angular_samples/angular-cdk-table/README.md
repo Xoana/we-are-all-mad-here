@@ -1,27 +1,21 @@
-# AngularCdkTable
+# About this Project
 
-This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 11.2.8.
+This project provides an example of Angular Material table with pagination and sorting. This project uses a mock API created using JSON server.
 
-## Development server
+To install and run this project, complete the following steps:
 
-Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The app will automatically reload if you change any of the source files.
+1. Create a virtual environment as described in [How to create a node virtual environment](../../docs/create_nodeenv.md).
 
-## Code scaffolding
+1. Delete the `package-lock.json` file.
 
-Run `ng generate component component-name` to generate a new component. You can also use `ng generate directive|pipe|service|class|guard|interface|enum|module`.
+1. Run `npm install --legacy-peer-deps` to install the application.
 
-## Build
+1. Open a terminal window (e.g., Git Bash) and run the following command to start the API service:
 
-Run `ng build` to build the project. The build artifacts will be stored in the `dist/` directory. Use the `--prod` flag for a production build.
+    `npm run api` 
 
-## Running unit tests
+1. In a separate terminal window, run the following command to serve the application:
 
-Run `ng test` to execute the unit tests via [Karma](https://karma-runner.github.io).
+    `npm serve`
 
-## Running end-to-end tests
-
-Run `ng e2e` to execute the end-to-end tests via [Protractor](http://www.protractortest.org/).
-
-## Further help
-
-To get more help on the Angular CLI use `ng help` or go check out the [Angular CLI Overview and Command Reference](https://angular.io/cli) page.
+1. Access the application at `http://localhost:4200/`.    

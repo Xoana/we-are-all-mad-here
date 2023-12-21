@@ -1,14 +1,14 @@
 <h2>Angular Material Table Example</h2>
-<div class="description">This project provides an example of Angular Material table with pagination, sorting, and search. This project uses a mock API created using JSON server.</div>
-<form>
-  <mat-form-field class="search_field">
-    <mat-label>Enter a Search Term</mat-label>
-    <input matInput name="searchTerm" [value]="searchTerm$.getValue()" (keyup)="getSearchTerm($event)">
+<div class="description">This project provides an example of Angular Material table with pagination and sorting. This project uses a mock API created using JSON server.</div>
+<!-- <form> -->
+  <!-- <mat-form-field class="search_field"> -->
+    <!-- <mat-label>Enter a Search Term</mat-label> -->
+    <!-- <input matInput name="searchTerm" [value]="searchTerm$.getValue()" (keyup)="getSearchTerm($event)"> -->
     <!-- <button *ngIf="searchTerm$ | async" matSuffix mat-icon-button aria-label="Clear" (click)="clearSearch()">
       <mat-icon>x</mat-icon>
     </button> -->
-  </mat-form-field>
-</form>
+  <!-- </mat-form-field> -->
+<!-- </form> -->
 <div class="table_container">
   <table mat-table [dataSource]="data$ | async" matSort (matSortChange)="getSortEvent($event)"
   class="mat-elevation-z8 mat__table">

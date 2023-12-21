@@ -38,19 +38,23 @@ export class AppComponent implements OnInit {
    * @returns API response
    */
   public fetchData() {
-
+    let apiUrl = '/api/periodicElements'
     let params = {
       _page: this.currentPage$.getValue(),
       _limit: this.itemsPerPage$.getValue(),
       _sort: this.sortByColumn$.getValue(),
       _order: this.sortOrder$.getValue()
     }
+    console.log(params)
     if (this.searchTerm$) { params['q'] = this.searchTerm$.getValue() }
 
-    return this.http.get('/api/periodicElements', { params })
-    // .pipe(
-    //   tap(res => console.log(`res: ${JSON.stringify(res)}`)),
-    // )
+    return this.http.get(`${apiUrl}?_page=${params._page}&_limit=${params._limit}&_sort=${params._sort}&_order=${params._order}`)
+  //   return this.http.get(apiUrl, { params })
+  //   .pipe(
+  //     tap(res => 
+  //       console.log(`res: ${JSON.stringify(res)}`)
+  //     ),
+  //   )
   }
 
   /**
@@ -67,6 +71,7 @@ export class AppComponent implements OnInit {
    * Get search term and initiate search.
    * @param event keyup event
    */
+  // TODO: Fix search...
   public getSearchTerm(event: any) {
 
     if (event.key == 'Enter') {
