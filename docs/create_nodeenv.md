@@ -10,7 +10,7 @@
 
     **Notes**:
     * To install a specific version: ```nodeenv -p --node=16.13.2```
-    * If `nodeenv -p` returns error stating there is no venv, rerun the `source` command.
+    * If `nodeenv -p` returns error stating there is no venv, ensure you are inside the venv, and rerun the `source` command.
     * See [Error: Failed to create nodejs.exe link](#error-failed-to-create-nodejsexe-link).
 
 1. Check node version:  ```$ node -v```
