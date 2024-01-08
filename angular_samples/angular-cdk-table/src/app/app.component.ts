@@ -1,8 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
-import { tap } from 'rxjs/operators';
-import { Parameters} from './app.config';
 
 @Component({
   selector: 'app-root',
@@ -18,26 +16,22 @@ export class AppComponent implements OnInit {
   public currentPage$ = new BehaviorSubject(1);
   public sortByColumn$ = new BehaviorSubject(null);
   public sortOrder$ = new BehaviorSubject('asc');
-  public data$ = new BehaviorSubject(this.fetchData());
   public totalItems$ = new BehaviorSubject(100);
   public pageSizeOptions = [5, 10, 25, 100];
-  public searchTerm$ = new BehaviorSubject(null);
-	public apiParams$: BehaviorSubject<Parameters> = new BehaviorSubject({
-    _page: this.currentPage$.getValue(),
-    _limit: this.itemsPerPage$.getValue(),
-    _sort: this.sortByColumn$.getValue(),
-    _order: this.sortOrder$.getValue()
-  });  
+  public searchTerm$ = new BehaviorSubject('');
+  public data$ = new BehaviorSubject(this.fetchData());
 
   constructor(private http: HttpClient) {}
-  
-  ngOnInit() {}
+  ngOnInit() {
+    console.log(`searchTerm: ${this.searchTerm$.getValue()}`)
+  }
 
   /**
    * Fetch the data.
    * @returns API response
    */
   public fetchData() {
+    this.searchTerm$.subscribe(val => console.log(`Inside fetchData: ${val}`))
     let apiUrl = '/api/periodicElements'
     let params = {
       _page: this.currentPage$.getValue(),
@@ -45,16 +39,15 @@ export class AppComponent implements OnInit {
       _sort: this.sortByColumn$.getValue(),
       _order: this.sortOrder$.getValue()
     }
-    console.log(params)
-    if (this.searchTerm$) { params['q'] = this.searchTerm$.getValue() }
 
-    return this.http.get(`${apiUrl}?_page=${params._page}&_limit=${params._limit}&_sort=${params._sort}&_order=${params._order}`)
-  //   return this.http.get(apiUrl, { params })
-  //   .pipe(
-  //     tap(res => 
-  //       console.log(`res: ${JSON.stringify(res)}`)
-  //     ),
-  //   )
+    if (this.searchTerm$.getValue() !== '') { params['q'] = this.searchTerm$.getValue() }
+
+    return this.http.get(apiUrl, { params })
+    // .pipe(
+    //   tap(res =>
+    //     console.log(`res: ${JSON.stringify(res)}`)
+    //   ),
+    // )
   }
 
   /**
@@ -71,15 +64,12 @@ export class AppComponent implements OnInit {
    * Get search term and initiate search.
    * @param event keyup event
    */
-  // TODO: Fix search...
   public getSearchTerm(event: any) {
-
     if (event.key == 'Enter') {
       this.searchTerm$.next(event.target.value);
       this.data$.next(this.fetchData());
       this.clearSearch()
     }
-    this.searchTerm$.subscribe(val => console.log(val))
   }
 
   /**

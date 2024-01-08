@@ -16,6 +16,6 @@ To install and run this project, complete the following steps:
 
 1. In a separate terminal window, run the following command to serve the application:
 
-    `npm serve`
+    `ng serve`
 
 1. Access the application at `http://localhost:4200/`.    
